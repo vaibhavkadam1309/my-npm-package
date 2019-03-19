@@ -1,0 +1,52 @@
+function DTO() {  
+    var dto = {};  
+    var isAllowKeyOverWrite = true;  
+    /** 
+     * function accept array of object and based on new key it update returning array of object with updated keys 
+     * @param {*} collection   Array of object 
+     * @param {*}   newKeyPair New key pair for old and new key  
+     * @param {*} overwrite Allow overwrite existing key or not 
+     */  
+    dto.mapTo = function (collection, newKeyPair, overwrite) {  
+        //TODO  Early exit check for invalid user input  
+        isAllowKeyOverWrite = overwrite !== undefined ? overwrite : isAllowKeyOverWrite;  
+        return collection.map(function (record) {  
+            // Clone new object to prevent modification of source object  
+            var item = Object.assign({}, record);  
+            for (var key in item) {  
+                // Restrict key as undefined while dynamic rename/inject new key in object  
+                // Restrict overwrite for existing key.  
+  
+                if (newKeyPair[key]) {  
+  
+                    var isKeyExist = newKeyPair[key] in item;  
+                    if (!isKeyExist) {  
+                        // If new key is not exist then not need to check isAllowKeyOverWrite flag  
+                        //Check new key is already exist or not  
+                        item[newKeyPair[key]] = item[key];  
+                        //itm["" + newKeyPair[key]] = itm[key];  
+  
+                        //Once you injected key delete old key from object.  
+                        delete item[key];  
+                    } else if (isKeyExist && isAllowKeyOverWrite) {  
+  
+                        // If new key is exist ,also check isAllowKeyOverWrite flag  
+                        item[newKeyPair[key]] = item[key];  
+                        //TODO Need to verify and modify below code if required.  
+                        delete item[key];  
+                    }  
+                }  
+            }  
+            // Deletion of old key code moved in above for loop  
+            // if (isKeyOverWrite) {  
+            //     for (var oldKey in newKeyPair) {  
+  
+            //         delete itm["" + oldKey];  
+            //     }  
+            // }  
+            return item;  
+        });  
+    };  
+    return dto;  
+}  
+module.exports = DTO();
